@@ -183,5 +183,4 @@ function checkReq(request, response, options) { // function to send request to s
     proxy_request.end();
   });
 }
-//DDOS:<victim IP>:port:time-limit
 

