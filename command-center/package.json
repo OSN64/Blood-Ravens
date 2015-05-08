@@ -20,5 +20,8 @@
   "bugs": {
     "url": "https://github.com/OSN64/Blood-Ravens/issues"
   },
-  "homepage": "https://github.com/OSN64/Blood-Ravens"
+  "homepage": "https://github.com/OSN64/Blood-Ravens",
+  "dependencies": {
+    "express": "^4.12.3"
+  }
 }
