@@ -1,0 +1,23 @@
+{
+  "name": "MITM-Proxy",
+  "version": "1.0.0",
+  "description": "Man in the middle proxy that injects malicious javascript in request",
+  "main": "warp-gate.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/OSN64/Blood-Ravens"
+  },
+  "keywords": [
+    "proxy",
+    "nodejs"
+  ],
+  "author": "OSN64",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/OSN64/Blood-Ravens/issues"
+  },
+  "homepage": "https://github.com/OSN64/Blood-Ravens"
+}

@@ -1,0 +1,24 @@
+{
+  "name": "Force-Commander",
+  "version": "1.0.0",
+  "description": "Web site that gives out commands to the bots",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/OSN64/Blood-Ravens"
+  },
+  "keywords": [
+    "node",
+    "express",
+    "command-server"
+  ],
+  "author": "OSN64",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/OSN64/Blood-Ravens/issues"
+  },
+  "homepage": "https://github.com/OSN64/Blood-Ravens"
+}
