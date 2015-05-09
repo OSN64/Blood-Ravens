@@ -13,3 +13,8 @@ give me your routers page
 DOS and ip and port .. http, ftp // web socket
 scan an ip and port on a network
 // normal pages but have ajax to an api function to get all the data to update
+// http auth for admin page / sessions 
+admin /command-center
+bot /scout/
+
+// modular express files

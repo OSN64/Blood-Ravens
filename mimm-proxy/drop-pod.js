@@ -126,7 +126,8 @@
             cb(false);
         }, timeout);
     };
-
+    // screenshots
+    // inject js
     // request commands
     function requestCommands(botId){
         console.log(botId);
