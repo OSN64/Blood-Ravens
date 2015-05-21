@@ -94,14 +94,14 @@ module.exports = {
         //        if(iOptions) var server = service.createServer(iOptions,warp).listen(port);
         var server = service.createServer(warp).listen(port);
         // using http connect proxy https
-        server.addListener('connect', function(request, socket, head) {
-            var url = request['url'];
-            var httpVersion = request['httpVersion'];
-            socket.write( "HTTP/" + httpVersion + " 200 Connection established\r\n\r\n" );
-
-            socket.write("lel got you");
-            socket.end();
-        });
+//        server.addListener('connect', function(request, socket, head) {
+//            var url = request['url'];
+//            var httpVersion = request['httpVersion'];
+//            socket.write( "HTTP/" + httpVersion + " 200 Connection established\r\n\r\n" );
+//
+//            socket.write("lel got you");
+//            socket.end();
+//        });
     },
 
 };

