@@ -12,7 +12,7 @@ module.exports = {
             var parseReq = url.parse(request.url, true); // parse the requested url
 
             var options = {
-                host: parseReq.host,
+                host: parseReq.hostname,
                 port: parseReq.port,
                 path: parseReq.path,
                 method: request.method,
@@ -30,10 +30,14 @@ module.exports = {
 
 
             // remove encoding cause its causing issues
-            delete options.headers['accept-encoding']
+            delete options.headers['accept-encoding'];
+
+//            console.log(options)
 
             var proxy_request = service.request(options, function(proxy_response) {
                 proxy_response.headers['Proxy-agent'] = "Warp-Gate";
+                proxy_response.headers['Access-Control-Allow-Origin'] = "*";
+                proxy_response.headers['Access-Control-Allow-Headers'] = "X-Requested-With";
                 // set expires here
                 // add length here
                 if (isJs){

