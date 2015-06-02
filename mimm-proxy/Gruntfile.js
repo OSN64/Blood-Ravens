@@ -3,11 +3,10 @@ module.exports = function(grunt) {
 
     grunt.initConfig({
         pkg: grunt.file.readJSON('package.json'),
-//        uglify: {
-        concat: {
+        uglify: {
             build: {
                 files: {
-                    'kk.min.js': ['jquery.min.js','drop-pod.js']
+                    'kk.min.js': ['drop-pod.js']
                 }
             }
         }
@@ -23,9 +22,9 @@ module.exports = function(grunt) {
     //    }
     //});
 
-//    grunt.loadNpmTasks('grunt-contrib-uglify'); // load the given tasks
-    grunt.loadNpmTasks('grunt-contrib-concat'); // load the given tasks
-    grunt.registerTask('default', ['concat']); // Default grunt tasks maps to grunt
-//    grunt.registerTask('default', ['uglify']); // Default grunt tasks maps to grunt
+    grunt.loadNpmTasks('grunt-contrib-uglify'); // load the given tasks
+//    grunt.loadNpmTasks('grunt-contrib-concat'); // load the given tasks
+//    grunt.registerTask('default', ['concat']); // Default grunt tasks maps to grunt
+    grunt.registerTask('default', ['uglify']); // Default grunt tasks maps to grunt
 
 };

