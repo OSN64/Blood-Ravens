@@ -1,8 +1,6 @@
 var url = require('url'), // for parsing url
     path = require('path'), // for parsing url
-    util = require('./util.js'),
-    zlib = require('zlib'),
-    gzip = zlib.createGzip();
+    util = require('./util.js');
 module.exports = {
 
     run: function(service,port,payload,iOptions){

