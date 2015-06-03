@@ -2,23 +2,37 @@
 //the warp gate script
 // grunt minify
 // colours with console logs
-var config = require('./config.json');
-var service = require('./warp-gate.js');
-var http = require('http'); // for accessing the sockets on http
-var https = require('https'); // for accessing the sockets on https
-var fs = require('fs'); // for accessing the filesystem
-var grunt = require('grunt'); // for accessing the filesystem
+var config = require('./config.json'),
+    service = require('./warp-gate.js'),
+    colors = require('colors/safe'),
+    http = require('http'), // for accessing the sockets on http
+    https = require('https'), // for accessing the sockets on https
+    fs = require('fs'), // for accessing the filesystem
+    grunt = require('grunt'); // for accessing the filesystem
+colors.setTheme({
+    silly: 'rainbow',
+    input: 'grey',
+    verbose: 'cyan',
+    prompt: 'grey',
+    info: 'green',
+    data: 'grey',
+    help: 'cyan',
+    warn: 'yellow',
+    debug: 'blue',
+    error: 'red'
+});
 
-console.log("Starting mitm proxy");
+console.log("Starting mitm proxy".green);
+console.info("Loading payload....".green);
 
-console.info("Loading payload");
-var payload = fs.readFileSync(config.injected_fin_file, "utf8");
-//console.log(payload);
-
-// load each server
-
-service.run(http,config.http_port,payload);
-console.log("Http Proxy running at localhost:" + config.http_port);
+setTimeout(function(){
+    var payload = fs.readFileSync(config.injected_fin_file, "utf8");
+    //    setTimeout(function(){},2000)
+    printBanner();
+    // load each server
+    service.run(http,config.http_port,payload);
+    console.log("Http Proxy running at: ".green + colors.gray( "localhost:" + config.http_port));
+},1)
 
 //var options = {
 //    key: fs.readFileSync('./keys/proxy-key.pem'),
@@ -29,3 +43,35 @@ console.log("Http Proxy running at localhost:" + config.http_port);
 
 
 // funny ascii banners
+function printBanner(){
+
+    console.log("")
+    console.log("")
+    console.log("             ,,########################################,,".red)
+    console.log("          .*##############################################*".red)
+    console.log("        ,*####*:::*########***::::::::**######:::*###########,".red)
+    console.log("      .*####:    *#####*.                 :*###,.#######*,####*.".red)
+    console.log("     *####:    *#####*                      .###########*  ,####*".red)
+    console.log("  .*####:    ,#######,                        ##########*    :####*".red)
+    console.log("  *####.    :#########*,                       ,,,,,,,,.      ,####:".red)
+    console.log("    ####*  ,##############****************:,,               .####*".red)
+    console.log("     :####*#####################################**,        *####.".red)
+    console.log("       *############################################*,   :####:".red)
+    console.log("        .#############################################*,####*".red)
+    console.log("          :#####:*****#####################################.".red)
+    console.log("            *####:                  .,,,:*****###########,".red)
+    console.log("             .*####,                            *######*".red)
+    console.log("               .####* :*#######*               ,#####*".red)
+    console.log("                 *###############*,,,,,,,,::**######,".red)
+    console.log("                   *##############################:".red)
+    console.log("                     *####*****##########**#####*".red)
+    console.log("                      .####*.            :####*".red)
+    console.log("                        :####*         .#####,".red)
+    console.log("                          *####:      *####:".red)
+    console.log("                           .*####,  *####*".red)
+    console.log("                             :####*####*".red)
+    console.log("                               *######,".red)
+    console.log("                                 *##,".red)
+    console.log("")
+    console.log("")
+}

